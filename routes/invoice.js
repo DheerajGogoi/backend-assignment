@@ -44,6 +44,7 @@ router.route('/add').post(async (req, res) => {
 
 router.get('/find/:id', async (req, res) => {
     try {
+        console.log(req.params.id);
         const invoice = await Invoice.findOne({ _id: req.params.id });
         !invoice && res.status(404).json("invoice not found");
 
@@ -71,9 +72,9 @@ router.get('/view/late', async (req, res) => {
     }
 });
 
-router.route('/update/status/:id').put(async(req, res) => {
+router.route('/update/status/:id/:statusType').put(async(req, res) => {
     try {
-        const updatedInvoice = await Invoice.findByIdAndUpdate( req.params.id, { status: req.body.status }, {new: true});
+        const updatedInvoice = await Invoice.findByIdAndUpdate( req.params.id, { status: req.params.statusType }, {new: true});
         !updatedInvoice && res.status(200).json(updatedInvoice);
 
         res.status(200).json(updatedInvoice);

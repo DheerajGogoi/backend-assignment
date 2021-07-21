@@ -1,7 +1,10 @@
 const router = require('express').Router();
+// const validate = require('express-validation');
 const Invoice = require('../models/invoice.model');
 const nodemailer = require("nodemailer");
 var smtpTransport = require('nodemailer-smtp-transport');
+// const { postInvoices } = require('./validation');
+const { body, validationResult } = require('express-validator'); 
 
 
 router.route('/all').get( async (req, res) => {
@@ -13,7 +16,38 @@ router.route('/all').get( async (req, res) => {
     }
 });
 
-router.route('/add').post(async (req, res) => {
+router.route('/add').post( [
+    body('name')
+        .notEmpty()
+        .withMessage('Name cannot be empty')
+        .isLength({min: 3})
+        .withMessage('Name must be atleast 5 characters long'),
+    body('workHours')
+        .notEmpty()
+        .withMessage('Work hours cannot be empty'),
+    body('expenses')
+        .notEmpty()
+        .withMessage('Expenses cannot be empty'),
+    body('labour')
+        .notEmpty()
+        .withMessage('Labour cannot be empty'),
+    body('notes')
+        .notEmpty()
+        .withMessage('Notes cannot be empty'),
+    body('status')
+        .notEmpty()
+        .withMessage('Invoice status cannot be empty'),
+    body('due')
+        .notEmpty()
+        .withMessage('Payment due date cannot be empty'),
+], async (req, res) => {
+
+    const errors = validationResult(req);
+    
+    if(!errors.isEmpty()){
+        return res.status(400).json({errors: errors.array()})
+    }
+
     try {
         function generateID() {
             var pass = '';
@@ -26,6 +60,7 @@ router.route('/add').post(async (req, res) => {
             return pass;
         }
         const newInvoice = new Invoice({
+            name: req.body.name,
             workHours: req.body.workHours+' per week',
             invoiceID: 'In#'+generateID(),
             expenses: 'Rs. '+req.body.expenses,

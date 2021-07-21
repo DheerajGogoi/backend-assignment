@@ -200,6 +200,59 @@ router.route('/send/mail/:id').get(async(req, res) => {
     }
 });
 ```
+### Data Validation
+```
+npm install express-validator
+```
+and inside
+> /routes/invoice.js
+```javascript
+const { body, validationResult } = require('express-validator'); 
+```
+- Data validation is done using express-validator while sending post requests mainly for adding new invoice
+```javascript
+router.route('/add').post( [
+    body('name')
+        .notEmpty()
+        .withMessage('Name cannot be empty')
+        .isLength({min: 3})
+        .withMessage('Name must be atleast 5 characters long'),
+    body('workHours')
+        .notEmpty()
+        .withMessage('Work hours cannot be empty'),
+    body('expenses')
+        .notEmpty()
+        .withMessage('Expenses cannot be empty'),
+    body('labour')
+        .notEmpty()
+        .withMessage('Labour cannot be empty'),
+    body('notes')
+        .notEmpty()
+        .withMessage('Notes cannot be empty'),
+    body('status')
+        .notEmpty()
+        .withMessage('Invoice status cannot be empty'),
+    body('due')
+        .notEmpty()
+        .withMessage('Payment due date cannot be empty'),
+], async (req, res) => {
+
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        return res.status(400).json({errors: errors.array()})
+    }
+    
+    // Your code...
+});
+```
+### Inside _server.js_ file
+- The routes are imported as
+```javascript
+// Your code .....
+const invoiceRouter = require('./routes/invoice')
+app.use('/invoice', invoiceRouter);
+// Your code .....
+```
 The server will be running of port 3000 and hence the respective api endpooints will be like
 - For vewing all invoices (get request)
 ```
@@ -212,7 +265,7 @@ https://localhost:3000/invoice/add
 where the object sent for post through this route should look like this:
 ```javascript
 {
-  workHours: /*work hours*/
+  workHours: /*work hours*/,
   expenses: /*weekly expenses*/,
   labour: /*labour*/,
   notes: /*A note example: a note for the instruction of paymeny*/,

@@ -1,9 +1,7 @@
 const router = require('express').Router();
-// const validate = require('express-validation');
 const Invoice = require('../models/invoice.model');
 const nodemailer = require("nodemailer");
 var smtpTransport = require('nodemailer-smtp-transport');
-// const { postInvoices } = require('./validation');
 const { body, validationResult } = require('express-validator'); 
 
 

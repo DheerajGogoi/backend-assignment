@@ -18,7 +18,7 @@ PORT=3000
 ### Schema/Structure of the data:
 
 > Location: /models/invoice.model.js
-```
+```javascript
 const invoiceSchema = new Schema({
     name: {
         type: String,
@@ -67,7 +67,7 @@ Where:
 ### Required routes:
 
 > Location: /routes/invoice.js
-```
+```javascript
 router.route('/all').get( async (req, res) => {
     try {
         const invoices = await Invoice.find();
@@ -77,7 +77,31 @@ router.route('/all').get( async (req, res) => {
     }
 });
 
-router.route('/add').post(async (req, res) => {
+router.route('/add').post( [
+    body('name')
+        .notEmpty()
+        .withMessage('Name cannot be empty')
+        .isLength({min: 3})
+        .withMessage('Name must be atleast 5 characters long'),
+    body('workHours')
+        .notEmpty()
+        .withMessage('Work hours cannot be empty'),
+    body('expenses')
+        .notEmpty()
+        .withMessage('Expenses cannot be empty'),
+    body('labour')
+        .notEmpty()
+        .withMessage('Labour cannot be empty'),
+    body('notes')
+        .notEmpty()
+        .withMessage('Notes cannot be empty'),
+    body('status')
+        .notEmpty()
+        .withMessage('Invoice status cannot be empty'),
+    body('due')
+        .notEmpty()
+        .withMessage('Payment due date cannot be empty'),
+], async (req, res) => {
     try {
         function generateID() {
             var pass = '';
@@ -186,7 +210,7 @@ https://localhost:3000/invoice/all
 https://localhost:3000/invoice/add
 ```
 where the object sent for post through this route should look like this:
-```
+```javascript
 {
   workHours: /*work hours*/
   expenses: /*weekly expenses*/,
